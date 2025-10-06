@@ -1,0 +1,1 @@
+// Global store goes here
