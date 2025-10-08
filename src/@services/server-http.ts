@@ -1,30 +1,15 @@
-import { API_BASE_URL } from "@/@config";
-import { ApiResponse, Stats } from "@/types";
+import { fetchStats } from "./http";
+import { Stats } from "@/types";
 
+/**
+ * Server-side wrapper for fetching stats
+ * Returns null on error instead of throwing (for graceful SSR degradation)
+ */
 export async function fetchStatsServer(): Promise<Stats | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/responses/stats`, {
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      console.error("Failed to fetch stats:", res.statusText);
-      return null;
-    }
-
-    const apiResponse = await res.json() as ApiResponse<Stats>;
-    
-    if (!apiResponse.success || !apiResponse.data) {
-      console.error("API error:", apiResponse.error?.message || "Unknown error");
-      return null;
-    }
-    
-    return apiResponse.data;
+    return await fetchStats({ cache: "no-store" });
   } catch (error) {
-    console.error("Error fetching stats:", error);
+    console.error("Error fetching stats on server:", error);
     return null;
   }
 }

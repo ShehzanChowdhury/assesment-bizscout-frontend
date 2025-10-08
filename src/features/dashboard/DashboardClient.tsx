@@ -11,9 +11,7 @@ import Header from "@/@components/common/Header";
 import Footer from "@/@components/common/Footer";
 import { useWebSocket } from "@/@hooks/useWebSocket";
 import { ResponseData, Stats } from "@/types";
-
-type SortKey = "timestamp" | "status" | "latency";
-type SortOrder = "asc" | "desc";
+import { SortState } from "@/types/table";
 
 interface DashboardClientProps {
   initialStats: Stats | null;
@@ -21,24 +19,43 @@ interface DashboardClientProps {
 
 export default function DashboardClient({ initialStats }: DashboardClientProps) {
   const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<{ key: SortKey; order: SortOrder }>({
+  const [sort, setSort] = useState<SortState>({
     key: "timestamp",
     order: "desc",
   });
   const [newResponses, setNewResponses] = useState<ResponseData[]>([]);
 
-  const { data: responsesData } = useSWR(
+  const { 
+    data: responsesData, 
+    error: responsesError, 
+    isLoading: isLoadingResponses 
+  } = useSWR(
     ["responses", page, DEFAULT_PAGE_SIZE],
     () => fetchResponses(page, DEFAULT_PAGE_SIZE),
-    { revalidateOnFocus: false }
+    { 
+      revalidateOnFocus: false,
+      shouldRetryOnError: true,
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
+      dedupingInterval: 2000,
+    }
   );
 
-  const { data: statsData, mutate: mutateStats } = useSWR(
+  const { 
+    data: statsData, 
+    error: statsError,
+    isLoading: isLoadingStats,
+    mutate: mutateStats 
+  } = useSWR(
     ["stats"],
     () => fetchStats(),
     { 
       revalidateOnFocus: false,
-      fallbackData: initialStats ?? undefined
+      shouldRetryOnError: true,
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
+      fallbackData: initialStats ?? undefined,
+      dedupingInterval: 2000,
     }
   );
 
@@ -68,9 +85,8 @@ export default function DashboardClient({ initialStats }: DashboardClientProps) 
 
   const meta = responsesData?.meta;
   const stats = statsData ?? initialStats;
-  const isLoadingResponses = !responsesData;
 
-  const onSort = (key: SortKey) => {
+  const onSort = (key: SortState['key']) => {
     const isSame = sort.key === key;
     const order = isSame && sort.order === "desc" ? "asc" : "desc";
     setSort({ key, order });
@@ -99,7 +115,19 @@ export default function DashboardClient({ initialStats }: DashboardClientProps) 
           <ConnectionStatus connected={connected} />
         </div>
         
-        <StatsSection stats={stats} />
+        <StatsSection stats={stats} isLoading={isLoadingStats} />
+        
+        {statsError && (
+          <div className="text-sm text-red-600 dark:text-red-400 p-3 bg-red-50 dark:bg-red-950/20 rounded border border-red-200 dark:border-red-800">
+            Failed to load statistics: {statsError.message}
+          </div>
+        )}
+        
+        {responsesError && (
+          <div className="text-sm text-red-600 dark:text-red-400 p-3 bg-red-50 dark:bg-red-950/20 rounded border border-red-200 dark:border-red-800">
+            Failed to load responses: {responsesError.message}
+          </div>
+        )}
 
         <ResponseTableSection
           items={items}

@@ -4,14 +4,15 @@ import React, { useMemo, useState } from "react";
 import { Table, TBody, TD, TH, THead, TR } from "@/@components/ui/Table";
 import { StatusBadge } from "@/@components/ui/Badge";
 import { ResponseData } from "@/types";
+import { SortState, SortKey } from "@/types/table";
 import { format } from "date-fns";
 import { ChevronDown, ChevronUp, Eye } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 
 type Props = {
   items: ResponseData[];
-  sort: { key: "timestamp" | "status" | "latency"; order: "asc" | "desc" };
-  onSort: (key: "timestamp" | "status" | "latency") => void;
+  sort: SortState;
+  onSort: (key: SortKey) => void;
 };
 
 export default function ResponseTable({ items, sort, onSort }: Props) {
@@ -37,15 +38,24 @@ export default function ResponseTable({ items, sort, onSort }: Props) {
     return copy;
   }, [items, sort]);
 
-  const header = (key: Props["sort"]["key"], label: string) => {
+  const header = (key: SortKey, label: string) => {
     const is = sort.key === key;
     const Icon = !is ? null : sort.order === "asc" ? ChevronUp : ChevronDown;
     return (
-      <button className="inline-flex items-center gap-1" onClick={() => onSort(key)} aria-label={`Sort by ${label}`}>
+      <button 
+        className="inline-flex items-center gap-1" 
+        onClick={() => onSort(key)} 
+        aria-label={`Sort by ${label}`}
+      >
         <span>{label}</span>
         {Icon ? <Icon className="h-3 w-3" /> : null}
       </button>
     );
+  };
+
+  const getSortAttr = (key: SortKey) => {
+    if (sort.key !== key) return "none";
+    return sort.order === "asc" ? "ascending" : "descending";
   };
 
   if (sorted.length === 0) {
@@ -57,18 +67,26 @@ export default function ResponseTable({ items, sort, onSort }: Props) {
       <Table>
         <THead>
           <TR>
-            <TH>{header("timestamp", "Timestamp")}</TH>
-            <TH>{header("status", "Status")}</TH>
-            <TH>{header("latency", "Latency")}</TH>
+            <TH aria-sort={getSortAttr("timestamp")}>{header("timestamp", "Timestamp")}</TH>
+            <TH aria-sort={getSortAttr("status")}>{header("status", "Status")}</TH>
+            <TH aria-sort={getSortAttr("latency")}>{header("latency", "Latency")}</TH>
             <TH>Request ID</TH>
             <TH>Actions</TH>
           </TR>
         </THead>
         <TBody>
           {sorted.map((r, index) => (
-            <React.Fragment key={r._id ?? String(index)}>
+            <React.Fragment key={r._id || `response-${index}`}>
               <TR className="hover:bg-black/5 dark:hover:bg-white/5">
-                <TD>{format(new Date(r.timestamp), "PPpp")}</TD>
+                <TD>
+                  {(() => {
+                    try {
+                      return format(new Date(r.timestamp), "PPpp");
+                    } catch {
+                      return r.timestamp;
+                    }
+                  })()}
+                </TD>
                 <TD>
                   <StatusBadge status={r.response.status} />
                 </TD>

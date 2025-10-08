@@ -5,14 +5,12 @@ import { Skeleton } from "@/@components/ui/Skeleton";
 import ResponseTable from "@/features/ResponseTable";
 import { ResponseData } from "@/types";
 import { PaginationMeta } from "@/types";
-
-type SortKey = "timestamp" | "status" | "latency";
-type SortOrder = "asc" | "desc";
+import { SortState, SortKey } from "@/types/table";
 
 interface ResponseTableSectionProps {
   items: ResponseData[];
   meta: PaginationMeta | undefined;
-  sort: { key: SortKey; order: SortOrder };
+  sort: SortState;
   onSort: (key: SortKey) => void;
   onPrev: () => void;
   onNext: () => void;

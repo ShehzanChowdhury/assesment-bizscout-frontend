@@ -18,7 +18,15 @@ export default function StatsSection({ stats, isLoading = false }: StatsSectionP
   const total = stats?.total ?? 0;
   const rate = stats?.successRate ?? 0;
   const avg = stats?.averageLatency ?? 0;
-  const last = stats?.lastPingTime ? format(new Date(stats.lastPingTime), "PPpp") : "—";
+  const last = stats?.lastPingTime 
+    ? (() => {
+        try {
+          return format(new Date(stats.lastPingTime), "PPpp");
+        } catch {
+          return stats.lastPingTime;
+        }
+      })()
+    : "—";
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
