@@ -40,22 +40,6 @@ This directory contains GitHub Actions workflows for continuous integration and 
 - ✅ Bundle size analysis
 - ✅ Detailed status reporting
 
-### 3. Coverage Report (`coverage-report.yml`)
-
-**Triggers:**
-- Push to `main` branch
-- Daily schedule (00:00 UTC)
-- Manual workflow dispatch
-
-**Jobs:**
-- **Coverage**: Generates detailed coverage reports
-
-**Features:**
-- ✅ Scheduled coverage reports
-- ✅ Coverage badge generation
-- ✅ Codecov integration
-- ✅ Long-term artifact retention (90 days)
-
 ## Setup Instructions
 
 ### 1. Required Secrets
@@ -151,7 +135,7 @@ npm run build
 
 ### Coverage Reports
 - **Location**: Workflow run → Artifacts
-- **Retention**: 30 days (CI), 90 days (Coverage Report)
+- **Retention**: 30 days
 - **Contents**: HTML reports, lcov files, JSON summaries
 
 ### Build Output
