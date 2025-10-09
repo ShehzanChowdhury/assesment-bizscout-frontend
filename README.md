@@ -345,31 +345,17 @@ npm run test:coverage
 
 ### Testing Best Practices
 
-1. **Arrange-Act-Assert Pattern**
-   ```typescript
-   it('should update stats on new response', () => {
-     // Arrange: Set up initial state
-     const { result } = renderHook(() => useWebSocket());
-     
-     // Act: Trigger the action
-     act(() => socket.emit('newResponse', mockData));
-     
-     // Assert: Verify the outcome
-     expect(result.current.connected).toBe(true);
-   });
-   ```
-
-2. **User-Centric Testing**
+1. **User-Centric Testing**
    - Test what users see and do, not implementation details
    - Use accessible queries (`getByRole`, `getByLabelText`)
    - Simulate real user interactions
 
-3. **Test Isolation**
+2. **Test Isolation**
    - Each test should be independent
    - Clean up after each test
    - Avoid shared state
 
-4. **Meaningful Assertions**
+3. **Meaningful Assertions**
    - Test behavior, not implementation
    - Use descriptive test names
    - One logical assertion per test
@@ -394,10 +380,6 @@ npm run test:coverage
 - [ ] **Service Worker** - Offline support and background sync
   - Cache API responses
   - Queue failed requests
-  
-- [ ] **Image Optimization** - Optimize assets with Next.js Image component
-  - Automatic WebP conversion
-  - Lazy loading
 
 ### Feature Enhancements
 
@@ -433,44 +415,12 @@ npm run test:coverage
   - Performance metrics
   - User session replay
 
-### Infrastructure
-
-- [ ] **Docker Support** - Containerize the application
-  - Multi-stage builds
-  - Development and production images
-  
-- [ ] **CDN Integration** - Serve static assets from CDN
-  - Faster global delivery
-  - Reduced server load
-  
-- [ ] **Database Caching** - Redis for API response caching
-  - Reduce database load
-  - Faster response times
-
 ### Accessibility
 
 - [ ] **WCAG 2.1 AA Compliance** - Full accessibility audit
   - Keyboard navigation
   - Screen reader support
   - Color contrast improvements
-  
-- [ ] **Internationalization (i18n)** - Multi-language support
-  - Use next-intl or react-i18next
-  - RTL language support
-
-### Security
-
-- [ ] **Rate Limiting** - Client-side request throttling
-  - Prevent API abuse
-  - Exponential backoff
-  
-- [ ] **Content Security Policy** - Strict CSP headers
-  - Prevent XSS attacks
-  - Whitelist trusted sources
-  
-- [ ] **Authentication** - Add user authentication
-  - OAuth 2.0 / JWT
-  - Role-based access control
 
 ---
 
@@ -478,7 +428,7 @@ npm run test:coverage
 
 ### Overview
 
-The project follows a comprehensive testing strategy with **100% code coverage** to ensure reliability and maintainability.
+The project follows a comprehensive testing strategy with **80% code coverage** to ensure reliability and maintainability.
 
 ### Test Infrastructure
 
