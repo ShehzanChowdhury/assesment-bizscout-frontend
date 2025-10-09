@@ -1,0 +1,103 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    name: Validate Pull Request
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+        continue-on-error: true
+        id: lint
+
+      - name: Run tests
+        run: npm test
+        id: test
+
+      - name: Check test coverage
+        run: npm run test:coverage -- --coverageThreshold='{"global":{"branches":80,"functions":80,"lines":80,"statements":80}}'
+        continue-on-error: true
+        id: coverage
+
+      - name: Comment PR with results
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const lintStatus = '${{ steps.lint.outcome }}' === 'success' ? '✅' : '❌';
+            const testStatus = '${{ steps.test.outcome }}' === 'success' ? '✅' : '❌';
+            const coverageStatus = '${{ steps.coverage.outcome }}' === 'success' ? '✅' : '⚠️';
+            
+            const comment = `## PR Validation Results
+            
+            | Check | Status |
+            |-------|--------|
+            | Linting | ${lintStatus} |
+            | Tests | ${testStatus} |
+            | Coverage | ${coverageStatus} |
+            
+            ${testStatus === '✅' ? '✅ All tests passed!' : '❌ Some tests failed. Please review the logs.'}
+            ${lintStatus === '✅' ? '✅ Linting passed!' : '❌ Linting issues found. Please fix them.'}
+            ${coverageStatus === '✅' ? '✅ Coverage threshold met!' : '⚠️ Coverage below threshold (80%).'}
+            
+            ---
+            *Automated check by GitHub Actions*
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  size-check:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Analyze bundle size
+        run: |
+          echo "## Bundle Size Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Build completed successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -d .next ]; then
+            echo "### Build Output" >> $GITHUB_STEP_SUMMARY
+            du -sh .next >> $GITHUB_STEP_SUMMARY
+          fi
