@@ -12,6 +12,7 @@ import Footer from "@/@components/common/Footer";
 import { useWebSocket } from "@/@hooks/useWebSocket";
 import { ResponseData, Stats } from "@/types";
 import { SortState } from "@/types/table";
+import { normalizeResponse } from "@/@utils/normalize";
 
 interface DashboardClientProps {
   initialStats: Stats | null;
@@ -52,20 +53,11 @@ export default function DashboardClient({ initialStats }: DashboardClientProps) 
   );
 
   const handleNewResponse = useCallback((incoming: Partial<ResponseData> & { id?: string }) => {
-    const _id = incoming?._id ?? incoming?.id;
-    if (!_id || !incoming.timestamp || !incoming.response) return;
-    
-    const normalized: ResponseData = {
-      _id,
-      timestamp: incoming.timestamp,
-      requestPayload: incoming.requestPayload ?? {},
-      response: incoming.response,
-      error: incoming.error,
-      createdAt: incoming.createdAt ?? new Date().toISOString(),
-      updatedAt: incoming.updatedAt ?? new Date().toISOString(),
-    };
-    setNewResponses((prev) => [normalized, ...prev].slice(0, DEFAULT_PAGE_SIZE));
-    mutateStats();
+    const normalized = normalizeResponse(incoming);
+    if (normalized) {
+      setNewResponses((prev) => [normalized, ...prev].slice(0, DEFAULT_PAGE_SIZE));
+      mutateStats();
+    }
   }, [mutateStats]);
 
   const { connected } = useWebSocket(handleNewResponse);

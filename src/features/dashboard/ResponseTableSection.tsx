@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/@components/ui/Card";
 import { Skeleton } from "@/@components/ui/Skeleton";
-import ResponseTable from "@/features/ResponseTable";
+import ResponseTable from "@/features/dashboard/ResponseTable";
 import { ResponseData } from "@/types";
 import { PaginationMeta } from "@/types";
 import { SortState, SortKey } from "@/types/table";

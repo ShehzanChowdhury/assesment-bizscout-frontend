@@ -8,6 +8,7 @@ import { SortState, SortKey } from "@/types/table";
 import { format } from "date-fns";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import ResponseDetailsModal from "./ResponseDetailsCollapsible";
+import { sortResponses } from "@/@utils/sort";
 
 type Props = {
   items: ResponseData[];
@@ -16,26 +17,7 @@ type Props = {
 };
 
 export default function ResponseTable({ items, sort, onSort }: Props) {
-
-  const sorted = useMemo(() => {
-    const copy = [...items];
-    copy.sort((a, b) => {
-      let av: number = 0;
-      let bv: number = 0;
-      if (sort.key === "timestamp") {
-        av = new Date(a.timestamp).getTime();
-        bv = new Date(b.timestamp).getTime();
-      } else if (sort.key === "status") {
-        av = a.response.status;
-        bv = b.response.status;
-      } else {
-        av = a.response.latency;
-        bv = b.response.latency;
-      }
-      return sort.order === "asc" ? av - bv : bv - av;
-    });
-    return copy;
-  }, [items, sort]);
+  const sorted = useMemo(() => sortResponses(items, sort), [items, sort]);
 
   const header = (key: SortKey, label: string) => {
     const is = sort.key === key;

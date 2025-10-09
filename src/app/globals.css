@@ -24,3 +24,44 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.custom-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgb(161 161 170) rgb(24 24 27); /* Firefox */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Webkit browsers */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgb(24 24 27); /* Dark track */
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(161 161 170); /* Light thumb */
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(212 212 216); /* Lighter thumb on hover */
+}
+
+@media (prefers-color-scheme: light) {
+  .custom-scrollbar {
+    scrollbar-color: rgb(82 82 91) rgb(244 244 245); /* Firefox */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgb(244 244 245); /* Light track */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgb(82 82 91); /* Dark thumb */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgb(63 63 70); /* Darker thumb on hover */
+  }
+}
