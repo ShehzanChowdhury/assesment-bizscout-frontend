@@ -41,21 +41,13 @@ export default function DashboardClient({ initialStats }: DashboardClientProps) 
     }
   );
 
-  const { 
-    data: statsData, 
-    error: statsError,
-    isLoading: isLoadingStats,
-    mutate: mutateStats 
-  } = useSWR(
+  const { mutate: mutateStats } = useSWR(
     ["stats"],
     () => fetchStats(),
     { 
       revalidateOnFocus: false,
-      shouldRetryOnError: true,
-      errorRetryCount: 3,
-      errorRetryInterval: 5000,
+      revalidateOnMount: false, // Don't fetch on mount since we have initialStats
       fallbackData: initialStats ?? undefined,
-      dedupingInterval: 2000,
     }
   );
 
@@ -84,7 +76,7 @@ export default function DashboardClient({ initialStats }: DashboardClientProps) 
     : responsesData?.items || [];
 
   const meta = responsesData?.meta;
-  const stats = statsData ?? initialStats;
+  const stats = initialStats;
 
   const onSort = (key: SortState['key']) => {
     const isSame = sort.key === key;
@@ -115,13 +107,7 @@ export default function DashboardClient({ initialStats }: DashboardClientProps) 
           <ConnectionStatus connected={connected} />
         </div>
         
-        <StatsSection stats={stats} isLoading={isLoadingStats} />
-        
-        {statsError && (
-          <div className="text-sm text-red-600 dark:text-red-400 p-3 bg-red-50 dark:bg-red-950/20 rounded border border-red-200 dark:border-red-800">
-            Failed to load statistics: {statsError.message}
-          </div>
-        )}
+        <StatsSection stats={stats} />
         
         {responsesError && (
           <div className="text-sm text-red-600 dark:text-red-400 p-3 bg-red-50 dark:bg-red-950/20 rounded border border-red-200 dark:border-red-800">

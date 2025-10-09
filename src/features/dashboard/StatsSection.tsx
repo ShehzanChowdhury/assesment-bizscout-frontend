@@ -1,32 +1,17 @@
-"use client";
-
 import { Card, CardContent } from "@/@components/ui/Card";
-import { Skeleton } from "@/@components/ui/Skeleton";
 import { Stats } from "@/types";
 import { format } from "date-fns";
 
 interface StatsSectionProps {
   stats: Stats | null;
-  isLoading?: boolean;
 }
 
-export default function StatsSection({ stats, isLoading = false }: StatsSectionProps) {
-  if (isLoading) {
-    return <StatsSkeleton />;
-  }
-
+export default function StatsSection({ stats }: StatsSectionProps) {
   const total = stats?.total ?? 0;
-  const rate = stats?.successRate ?? 0;
-  const avg = stats?.averageLatency ?? 0;
-  const last = stats?.lastPingTime 
-    ? (() => {
-        try {
-          return format(new Date(stats.lastPingTime), "PPpp");
-        } catch {
-          return stats.lastPingTime;
-        }
-      })()
-    : "—";
+  const rate = (stats?.successRate ?? 0) * 100;
+  const avg = stats?.avgLatency ?? 0;
+  const lastPingTime = stats ? new Date().toISOString() : null;
+  const last = lastPingTime ? format(new Date(lastPingTime), "PPpp") : "—";
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -48,22 +33,5 @@ function StatCard({ label, value }: { label: string; value: string }) {
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function StatsSkeleton() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {[...Array(4)].map((_, i) => (
-        <Card key={i}>
-          <CardContent>
-            <div className="flex flex-col gap-1">
-              <Skeleton className="h-3 w-24" />
-              <Skeleton className="h-7 w-32" />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
   );
 }

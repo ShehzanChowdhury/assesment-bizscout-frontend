@@ -41,8 +41,8 @@ export interface ApiResponse<T> {
 export interface Stats {
   total: number;
   successRate: number;
-  averageLatency: number;
-  lastPingTime: string | null;
+  avgLatency: number;
+  lastPingTime?: string;
 }
 
 export interface PaginatedResponses {
