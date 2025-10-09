@@ -6,7 +6,7 @@ import { ResponseData, PaginationMeta } from '@/types';
 import { SortState } from '@/types/table';
 
 // Mock the child components with more realistic behavior
-jest.mock('@/features/ResponseTable', () => {
+jest.mock('@/features/dashboard/ResponseTable', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return function MockResponseTable({ items, sort, onSort }: any) {
     return (
